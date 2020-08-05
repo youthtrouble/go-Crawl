@@ -38,7 +38,7 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 	if len(args) < 1 {   
-		fmt.Println("Please specify start page")  // if a starting page wasn't provided as an argument
+		fmt.Println("Please input a URL")  // if a URL wasn't provided as an argument
 		os.Exit(1)                                // show a message and exit.
 	  }
 	  getBody(args[0])    
