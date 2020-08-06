@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
-	"flag"
 	"net/http"
-	"os"
+	"strings"
+	
 	"golang.org/x/net/html"
 )
+
+
 
 func getBody(url string) {
 	resp, err := http.Get(url) 
@@ -27,19 +29,17 @@ func getBody(url string) {
 		if tokenType == html.StartTagToken && token.DataAtom.String() == "a" {
 			for _, KeyVal := range token.Attr {
 				if KeyVal.Key == "href" {
-					fmt.Println(KeyVal.Val)
+					if strings.Contains(KeyVal.Val, "/jobs/") {
+						fmt.Println("https://ng.indeed.com" + KeyVal.Val)
+					}
 				}
 			}
 		}
 	}
 }
 
+
+
 func main() {
-	flag.Parse()
-	args := flag.Args()
-	if len(args) < 1 {   
-		fmt.Println("Please input a URL")  // if a URL wasn't provided as an argument
-		os.Exit(1)                                // show a message and exit.
-	  }
-	  getBody(args[0])    
+	getBody("https://ng.indeed.com/jobs-in-Lagos")
 }
