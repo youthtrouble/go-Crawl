@@ -35,14 +35,20 @@ func getBody(url string) {
 		if tokenType == html.StartTagToken && token.DataAtom.String() == "a" {
 			for _, KeyVal := range token.Attr {
 				if KeyVal.Key == "href" {
-					if strings.Contains(KeyVal.Val, "/jobs/") {
+					if strings.Contains(KeyVal.Val, "/jobs/") || strings.Contains(KeyVal.Val, "/pagead/") || strings.Contains(KeyVal.Val, "/rc/") {
 						url := "https://ng.indeed.com" + KeyVal.Val
 						_, exists := anchors[url]
 						if !exists {
 							anchors[url] = true
 						}
+						break
 					}
+					//if strings.Contains(KeyVal.Val, "/jobs?q=&l=Lagos&start") {
+					//	next := "https://ng.indeed.com" + KeyVal.Val
+					//	getBody(next)
+					//}
 				}
+
 			}
 		}
 	}
