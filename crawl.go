@@ -43,10 +43,11 @@ func getBody(url string) {
 						}
 						break
 					}
-					//if strings.Contains(KeyVal.Val, "/jobs?q=&l=Lagos&start") {
-					//	next := "https://ng.indeed.com" + KeyVal.Val
-					//	getBody(next)
-					//}
+					if strings.Contains(KeyVal.Val, "/jobs?q=&l=Lagos&start") {
+						next := "https://ng.indeed.com" + KeyVal.Val
+						getBody(next)
+						return
+					}
 				}
 
 			}
