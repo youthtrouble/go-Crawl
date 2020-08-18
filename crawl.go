@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	//"flag"
@@ -12,7 +13,12 @@ import (
 
 
 
-func getBody(url string) {
+func getBody(url string, nextURLs map[string]bool) {
+
+	if len(nextURLs) > 20 {
+		return
+	}
+
 	resp, err := http.Get(url) 
 	if err != nil {
 		fmt.Printf("URL %s is invalid", url)
@@ -45,16 +51,22 @@ func getBody(url string) {
 					}
 					if strings.Contains(KeyVal.Val, "/jobs?q=&l=Lagos&start") {
 						next := "https://ng.indeed.com" + KeyVal.Val
-						getBody(next)
-						return
+						_, URLexists := nextURLs[next]
+						if !URLexists {
+							nextURLs[next] = true
+						} else {
+							continue
+						}
+						for key := range anchors {
+							fmt.Println(key)
+						}
+						log.Println("Going to", next)
+						getBody(next, nextURLs)
 					}
 				}
 
 			}
 		}
-	}
-	for key := range anchors {
-		fmt.Println(key)
 	}
 }
 
@@ -68,5 +80,5 @@ func main() {
 	// 	os.Exit(1)                                // show a message and exit.
 	//   }
 	//   getBody(args[0])
-	getBody("https://ng.indeed.com/jobs-in-Lagos")
+	getBody("https://ng.indeed.com/jobs-in-Lagos", make(map[string]bool))
 }
