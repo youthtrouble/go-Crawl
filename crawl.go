@@ -11,7 +11,10 @@ import (
 	"golang.org/x/net/html"
 )
 
-
+type jobInfo struct {
+	Title string
+	companyName string
+}
 
 func getBody(url string, nextURLs map[string]bool) {
 
@@ -25,7 +28,7 @@ func getBody(url string, nextURLs map[string]bool) {
 	}
 	defer resp.Body.Close()
 
-	anchors := make(map[string]bool)
+	anchors := make(map[string]jobInfo)
 
 	page := html.NewTokenizer(resp.Body)
 	for {
@@ -43,6 +46,20 @@ func getBody(url string, nextURLs map[string]bool) {
 				if KeyVal.Key == "href" {
 					if strings.Contains(KeyVal.Val, "/jobs/") || strings.Contains(KeyVal.Val, "/pagead/") || strings.Contains(KeyVal.Val, "/rc/") {
 						url := "https://ng.indeed.com" + KeyVal.Val
+
+						jobresp, err := http.Get(url)
+						if err != nil {
+							log.Println("Job link unresponsive")
+						}
+						defer jobresp.Body.Close()
+
+						jobpage := html.NewTokenizer(jobresp.Body)
+
+						jobtoken := jobpage.Token()
+						if tokenType == html.StartTagToken && token.DataAtom.String() == "h1" {
+
+						}
+
 						_, exists := anchors[url]
 						if !exists {
 							anchors[url] = true
