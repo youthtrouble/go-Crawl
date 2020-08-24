@@ -13,7 +13,6 @@ import (
 
 type jobInfo struct {
 	Title string
-	companyName string
 }
 
 func getBody(url string, nextURLs map[string]bool) {
@@ -47,12 +46,14 @@ func getBody(url string, nextURLs map[string]bool) {
 					if strings.Contains(KeyVal.Val, "/jobs/") || strings.Contains(KeyVal.Val, "/pagead/") || strings.Contains(KeyVal.Val, "/rc/") {
 						url := "https://ng.indeed.com" + KeyVal.Val
 
+						//going into the links to obtain information
 						jobresp, err := http.Get(url)
 						if err != nil {
 							log.Println("Job link unresponsive")
 						}
 						defer jobresp.Body.Close()
 
+						//tokenize the page
 						jobpage := html.NewTokenizer(jobresp.Body)
 
 						for {
@@ -62,15 +63,17 @@ func getBody(url string, nextURLs map[string]bool) {
 								break
 							}
 
+							//if we find a h1 tag, extract the data
 							jobtoken := jobpage.Token()
 							if jobTokentype == html.StartTagToken && token.DataAtom.String() == "h1" {
-								jobTitle := jobtoken.Text()
+								jobInfo{Title: jobtoken.Data}
+
 							}
 						}
 
 						_, exists := anchors[url]
 						if !exists {
-							anchors[url] = true
+							anchors[url] = jobInfo
 						}
 						break
 					}
