@@ -66,7 +66,7 @@ func getBody(url string, nextURLs map[string]bool) {
 							//if we find a h1 tag, extract the data
 							jobtoken := jobpage.Token()
 							if jobTokentype == html.StartTagToken && token.DataAtom.String() == "h1" {
-								jobInfo{Title: jobtoken.Data}
+								jobtoken = jobInfo{Title: jobtoken.Data}
 
 							}
 						}
