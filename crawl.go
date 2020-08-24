@@ -55,9 +55,17 @@ func getBody(url string, nextURLs map[string]bool) {
 
 						jobpage := html.NewTokenizer(jobresp.Body)
 
-						jobtoken := jobpage.Token()
-						if tokenType == html.StartTagToken && token.DataAtom.String() == "h1" {
+						for {
+							jobTokentype := jobpage.Next()
 
+							if jobTokentype == html.ErrorToken {
+								break
+							}
+
+							jobtoken := jobpage.Token()
+							if jobTokentype == html.StartTagToken && token.DataAtom.String() == "h1" {
+								jobTitle := jobtoken.Text()
+							}
 						}
 
 						_, exists := anchors[url]
