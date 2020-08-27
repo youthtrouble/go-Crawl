@@ -17,7 +17,7 @@ type jobInfo struct {
 
 func getBody(url string, nextURLs map[string]bool) {
 
-	if len(nextURLs) > 20 {
+	if len(nextURLs) > 1 {
 		return
 	}
 
@@ -27,6 +27,7 @@ func getBody(url string, nextURLs map[string]bool) {
 	}
 	defer resp.Body.Close()
 
+	//var Info string
 	anchors := make(map[string]jobInfo)
 
 	page := html.NewTokenizer(resp.Body)
@@ -46,11 +47,18 @@ func getBody(url string, nextURLs map[string]bool) {
 					if strings.Contains(KeyVal.Val, "/jobs/") || strings.Contains(KeyVal.Val, "/pagead/") || strings.Contains(KeyVal.Val, "/rc/") {
 						url := "https://ng.indeed.com" + KeyVal.Val
 
+						_, exists := anchors[url]
+						if exists {
+							continue
+						}
+
 						//going into the links to obtain information
 						jobresp, err := http.Get(url)
 						if err != nil {
 							log.Println("Job link unresponsive")
+							continue
 						}
+
 						defer jobresp.Body.Close()
 
 						//tokenize the page
@@ -66,16 +74,9 @@ func getBody(url string, nextURLs map[string]bool) {
 							//if we find a h1 tag, extract the data
 							jobtoken := jobpage.Token()
 							if jobTokentype == html.StartTagToken && token.DataAtom.String() == "h1" {
-								jobInfo{Title: jobtoken.Data}
-
+								anchors[url] = jobInfo{Title: jobtoken.Data}
 							}
 						}
-
-						_, exists := anchors[url]
-						if !exists {
-							anchors[url] = jobInfo
-						}
-						break
 					}
 					if strings.Contains(KeyVal.Val, "/jobs?q=&l=Lagos&start") {
 						next := "https://ng.indeed.com" + KeyVal.Val
