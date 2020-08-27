@@ -34,8 +34,8 @@ func getBody(url string, nextURLs map[string]bool) {
 	for {
 		tokenType := page.Next()
 		if tokenType == html.ErrorToken {
-			// for _, anchor := range(anchors) {
-			// 	fmt.Println(anchor)
+			//for _, anchor := range(anchors) {
+			//	fmt.Println(anchor)
 			break
 			
 		}
