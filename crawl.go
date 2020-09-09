@@ -17,7 +17,7 @@ type jobInfo struct {
 
 func getBody(url string, nextURLs map[string]bool) {
 
-	if len(nextURLs) > 1 {
+	if len(nextURLs) > 20 {
 		return
 	}
 
