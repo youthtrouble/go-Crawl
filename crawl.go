@@ -11,7 +11,9 @@ import (
 	"golang.org/x/net/html"
 )
 
-
+type jobInfo struct {
+	Title string
+}
 
 func getBody(url string, nextURLs map[string]bool) {
 
@@ -25,14 +27,15 @@ func getBody(url string, nextURLs map[string]bool) {
 	}
 	defer resp.Body.Close()
 
-	anchors := make(map[string]bool)
+	//var Info string
+	anchors := make(map[string]jobInfo)
 
 	page := html.NewTokenizer(resp.Body)
 	for {
 		tokenType := page.Next()
 		if tokenType == html.ErrorToken {
-			// for _, anchor := range(anchors) {
-			// 	fmt.Println(anchor)
+			//for _, anchor := range(anchors) {
+			//	fmt.Println(anchor)
 			break
 			
 		}
@@ -43,11 +46,37 @@ func getBody(url string, nextURLs map[string]bool) {
 				if KeyVal.Key == "href" {
 					if strings.Contains(KeyVal.Val, "/jobs/") || strings.Contains(KeyVal.Val, "/pagead/") || strings.Contains(KeyVal.Val, "/rc/") {
 						url := "https://ng.indeed.com" + KeyVal.Val
+
 						_, exists := anchors[url]
-						if !exists {
-							anchors[url] = true
+						if exists {
+							continue
 						}
-						break
+
+						//going into the links to obtain information
+						jobresp, err := http.Get(url)
+						if err != nil {
+							log.Println("Job link unresponsive")
+							continue
+						}
+
+						defer jobresp.Body.Close()
+
+						//tokenize the page
+						jobpage := html.NewTokenizer(jobresp.Body)
+
+						for {
+							jobTokentype := jobpage.Next()
+
+							if jobTokentype == html.ErrorToken {
+								break
+							}
+
+							//if we find a h1 tag, extract the data
+							jobtoken := jobpage.Token()
+							if jobTokentype == html.StartTagToken && token.DataAtom.String() == "h1" {
+								anchors[url] = jobInfo{Title: jobtoken.Data}
+							}
+						}
 					}
 					if strings.Contains(KeyVal.Val, "/jobs?q=&l=Lagos&start") {
 						next := "https://ng.indeed.com" + KeyVal.Val
